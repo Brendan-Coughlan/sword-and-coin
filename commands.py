@@ -4,10 +4,10 @@ COMMANDS = {
         "args": ["command"],
         "handler": "cmd_help"
     },
-    "inventory": {
-        "description": "Display your inventory",
+    "stats": {
+        "description": "Display your stats",
         "args": [],
-        "handler": "cmd_inventory"
+        "handler": "cmd_stats"
     },
     "quit": {
         "description": "Quit the game",

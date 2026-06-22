@@ -17,8 +17,8 @@ class Game:
         else:
             print("Command not found.")
 
-    def cmd_inventory(self):
-        self.player.display_stats()
+    def cmd_stats(self):
+        print(self.player)
 
     def handle_command(self, command_name, *args):
         parts = command_name.split()
