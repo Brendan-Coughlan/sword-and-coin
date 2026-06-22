@@ -1,23 +1,24 @@
 from commands import *
+from player import Player
 
 class Game:
     def __init__(self):
-        self.hp = 100
-        self.gold = 50
+        self.player = Player(name="Hero", starting_gold=50)
 
-    def cmd_look(self):
-        print("You are standing in a small village.")
+    def cmd_quit(self):
+        print("Thanks for playing!")
+        exit(0)
+
+    def cmd_help(self, command):
+        if command in COMMANDS:
+            info = COMMANDS[command]
+            args = " ".join(f"<{arg}>" for arg in info["args"])
+            print(f"  {command} {args} - {info['description']}")
+        else:
+            print("Command not found.")
 
     def cmd_inventory(self):
-        print(f"HP: {self.hp}")
-        print(f"Gold: {self.gold}")
-
-    def cmd_attack(self, target):
-        print(f"You swing your sword at {target}!")
-
-    def cmd_rest(self):
-        self.hp = min(100, self.hp + 20)
-        print(f"You rest and recover health. HP = {self.hp}")
+        self.player.display_stats()
 
     def handle_command(self, command_name, *args):
         parts = command_name.split()
@@ -33,11 +34,13 @@ class Game:
         if not command:
             print("Unknown command.")
             return
-        
+
         expected_args = len(command["args"])
-        
+
         if len(args) < expected_args:
-            print(f"Usage: {command_name} {' '.join(f'<{a}>' for a in command['args'])}")
+            print(
+                f"Usage: {command_name} {' '.join(f'<{a}>' for a in command['args'])}"
+            )
             return
 
         handler = getattr(self, command["handler"], None)
@@ -50,8 +53,5 @@ class Game:
 
         while True:
             user_input = input("> ").strip().lower()
-
-            if user_input == "quit":
-                break
 
             self.handle_command(user_input)
