@@ -19,13 +19,16 @@ class Game:
         self.player = Player("Hero")
         self.location = self.dungeon
 
+    # Command to quit the game
     def cmd_quit(self):
         print("Thanks for playing!")
         exit(0)
 
+    # Command to display the player's current location
     def cmd_location(self):
         self.location.display()
 
+    # Command to display help for a specific command
     def cmd_help(self, command):
         if command in COMMANDS:
             info = COMMANDS[command]
@@ -34,15 +37,18 @@ class Game:
         else:
             print("Command not found.")
 
+    # Stats command to display player stats
     def cmd_stats(self):
         self.player.display_stats()
 
+    # Forward command to move deeper into the dungeon
     def cmd_forward(self):
         if isinstance(self.location, Dungeon):
             self.location.move_forward()
         else:
             print("You can't move forward from here.")
 
+    # Leave command to exit the dungeon and return to town
     def cmd_leave(self):
         if isinstance(self.location, Dungeon):
             self.location = self.town
@@ -50,6 +56,7 @@ class Game:
         else:
             print("You are not in a dungeon.")
 
+    # Travel command to move between locations
     def cmd_travel(self, location_name):
         if self.location.name.lower() == location_name.lower():
             print(f"You are already in {location_name}.")
@@ -64,6 +71,7 @@ class Game:
         else:
             print(f"Unknown location: {location_name}")
 
+    # Handle user input and execute the corresponding command
     def handle_command(self, command_name, *args):
         parts = command_name.split()
 
@@ -92,6 +100,7 @@ class Game:
         if handler:
             handler(*args)
 
+    # Run the game loop, continuously prompting for user input and handling commands
     def run(self):
         print("Welcome to Sword & Coin!")
 
