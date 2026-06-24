@@ -1,13 +1,26 @@
 from commands import *
+from enemy import Enemy
+from location import Location
 from player import Player
+
 
 class Game:
     def __init__(self):
-        self.player = Player(name="Hero", starting_gold=50)
+        self.dungeon = Location("Dungeon", "A dark and damp dungeon.")
+
+        self.goblin = Enemy(
+            "Goblin", hp=30, strength=5, defense=2, xp_reward=10, gold_reward=5
+        )
+
+        self.player = Player("Hero")
+        self.location = self.dungeon
 
     def cmd_quit(self):
         print("Thanks for playing!")
         exit(0)
+
+    def cmd_location(self):
+        self.location.display()
 
     def cmd_help(self, command):
         if command in COMMANDS:
@@ -18,7 +31,7 @@ class Game:
             print("Command not found.")
 
     def cmd_stats(self):
-        print(self.player)
+        self.player.display_stats()
 
     def handle_command(self, command_name, *args):
         parts = command_name.split()

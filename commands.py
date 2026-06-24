@@ -9,6 +9,11 @@ COMMANDS = {
         "args": [],
         "handler": "cmd_stats"
     },
+    "location": {
+        "description": "Display your current location",
+        "args": [],
+        "handler": "cmd_location"
+    },
     "quit": {
         "description": "Quit the game",
         "args": [],

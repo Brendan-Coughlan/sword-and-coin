@@ -1,9 +1,11 @@
 from inventory import Inventory
 
 class Player:
-    def __init__(self, name, starting_gold=50):
+    def __init__(self, name):
         self.name = name
-        self.gold = starting_gold
+        self.gold = 0
+        self.xp = 0
+        self.level = 1
         self.stats = {
             "hp": 100,
             "strength": 10,
@@ -12,9 +14,7 @@ class Player:
         }
         self.inventory = Inventory()
 
-    def __str__(self):
-        result = f"{self.name}'s Stats:\n"
+    def display_stats(self):
+        print(f"{self.name}'s Stats:")
         for stat, value in self.stats.items():
-            result += f"  {stat.capitalize()}: {value}\n"
-        result += f"  Gold: {self.gold}"
-        return result
+            print(f"  {stat.capitalize()}: {value}")
