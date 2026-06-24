@@ -1,4 +1,5 @@
 from commands import *
+from dungeon import Dungeon
 from enemy import Enemy
 from location import Location
 from player import Player
@@ -6,7 +7,10 @@ from player import Player
 
 class Game:
     def __init__(self):
-        self.dungeon = Location("Dungeon", "A dark and damp dungeon.")
+        self.town = Location("Town", "A bustling town with shops and NPCs.")
+        self.dungeon = Dungeon(
+            "Dungeon", "A damp cave filled with goblins.", difficulty=1
+        )
 
         self.goblin = Enemy(
             "Goblin", hp=30, strength=5, defense=2, xp_reward=10, gold_reward=5
@@ -32,6 +36,33 @@ class Game:
 
     def cmd_stats(self):
         self.player.display_stats()
+
+    def cmd_forward(self):
+        if isinstance(self.location, Dungeon):
+            self.location.move_forward()
+        else:
+            print("You can't move forward from here.")
+
+    def cmd_leave(self):
+        if isinstance(self.location, Dungeon):
+            self.location = self.town
+            print("You leave the dungeon and return to town.")
+        else:
+            print("You are not in a dungeon.")
+
+    def cmd_travel(self, location_name):
+        if self.location.name.lower() == location_name.lower():
+            print(f"You are already in {location_name}.")
+            return
+
+        if location_name.lower() == "dungeon":
+            self.location = self.dungeon
+            print("You travel to the dungeon.")
+        elif location_name.lower() == "town":
+            self.location = self.town
+            print("You travel to the town.")
+        else:
+            print(f"Unknown location: {location_name}")
 
     def handle_command(self, command_name, *args):
         parts = command_name.split()

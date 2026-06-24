@@ -18,5 +18,20 @@ COMMANDS = {
         "description": "Quit the game",
         "args": [],
         "handler": "cmd_quit"
+    },
+    "forward": {
+        "description": "Move forward in the dungeon",
+        "args": [],
+        "handler": "cmd_forward"
+    },
+    "leave": {
+        "description": "Leave the dungeon and return to the main area",
+        "args": [],
+        "handler": "cmd_leave"
+    },
+    "travel": {
+        "description": "Travel to a different location",
+        "args": ["location_name"],
+        "handler": "cmd_travel"
     }
 }
