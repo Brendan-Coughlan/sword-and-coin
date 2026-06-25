@@ -20,6 +20,11 @@ class Player:
         print(f"  Defense: {self.defense}")
         print(f"  Luck: {self.luck}")
 
+    def calculate_attack_damage(self):
+        base_damage = self.strength
+        
+        return base_damage
+
     def gain_xp(self, amount):
         self.xp += amount
         print(f"You gained {amount} XP!")
@@ -39,7 +44,7 @@ class Player:
         print(f"Congratulations! You've reached level {self.level}!")
 
     def take_damage(self, amount):
-        damage_taken = max(0, amount - self.defense)
+        damage_taken = amount
         self.health -= damage_taken
 
         if self.health <= 0:

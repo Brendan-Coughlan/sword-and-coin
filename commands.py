@@ -48,5 +48,15 @@ COMMANDS = {
         "description": "Display the current enemy's stats",
         "args": [],
         "handler": "cmd_enemy"
+    },
+    "balance": {
+        "description": "Display your current balance",
+        "args": [],
+        "handler": "cmd_balance"
+    },
+    "xp": {
+        "description": "Display your current XP",
+        "args": [],
+        "handler": "cmd_xp"
     }
 }

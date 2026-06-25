@@ -15,18 +15,35 @@ class Game:
         self.player = Player("Hero")
         self.location = self.dungeon
 
+    def check_if_in_dungeon(self):
+        return isinstance(self.location, Dungeon)
+
+    def check_if_in_combat(self):
+        if isinstance(self.location, Dungeon):
+            if self.dungeon.get_current_room() and self.dungeon.get_current_room().enemies:
+                return True
+        return False
+
+    # Command to display the player's current balance
+    def cmd_balance(self):
+        print(f"Your current balance is: {self.player.gold} gold.")
+
+    # Command to display the player's current XP
+    def cmd_xp(self):
+        print(f"Your current XP is: {self.player.xp} XP.")
+
     # Command to attack an enemy
     def cmd_attack(self):
-        if not isinstance(self.location, Dungeon):
+        if not self.check_if_in_dungeon():
             print("You can't attack here.")
             return
 
-        if not self.dungeon.get_current_room().enemies:
+        if not self.check_if_in_combat():
             print("There is no enemy to attack.")
             return
 
-        damage = max(0, self.player.strength - self.dungeon.get_current_room().enemies[0].defense)
-        self.dungeon.get_current_room().enemies[0].hp -= damage
+        damage = self.player.calculate_attack_damage()
+        self.dungeon.get_current_room().enemies[0].take_damage(damage)
         print(f"You attack the {self.dungeon.get_current_room().enemies[0].name} for {damage} damage!")
 
         if self.dungeon.get_current_room().enemies[0].hp <= 0:
@@ -40,7 +57,7 @@ class Game:
 
     # Command to flee from an enemy
     def cmd_flee(self):
-        if not self.dungeon.get_current_room().enemies:
+        if not self.check_if_in_combat():
             print("You are not in combat.")
             return
 
@@ -57,22 +74,13 @@ class Game:
     def cmd_location(self):
         self.location.display()
 
-    # Command to display help for a specific command
-    def cmd_help(self, command):
-        if command in COMMANDS:
-            info = COMMANDS[command]
-            args = " ".join(f"<{arg}>" for arg in info["args"])
-            print(f"  {command} {args} - {info['description']}")
-        else:
-            print("Command not found.")
-
     # Stats command to display player stats
     def cmd_stats(self):
         self.player.display_stats()
 
     # Command to display the current enemy's stats
     def cmd_enemy(self):
-        if not self.dungeon.get_current_room().enemies:
+        if not self.check_if_in_combat():
             print("No enemy present.")
             return
 
@@ -83,11 +91,11 @@ class Game:
 
     # Forward command to move deeper into the dungeon
     def cmd_forward(self):
-        if not isinstance(self.location, Dungeon):
+        if not self.check_if_in_dungeon():
             print("You can't move forward from here.")
             return
 
-        if self.dungeon.get_current_room() and self.dungeon.get_current_room().enemies:
+        if self.check_if_in_combat():
             print("You must defeat the current enemy before moving forward!")
             return
 
@@ -95,9 +103,13 @@ class Game:
 
     # Leave command to exit the dungeon and return to town
     def cmd_leave(self):
-        if isinstance(self.location, Dungeon):
-            self.location = self.town
-            print("You leave the dungeon and return to town.")
+        if self.check_if_in_dungeon():
+            if self.check_if_in_combat():
+                print("You must defeat the current enemy before leaving the dungeon!")
+                return
+            else:
+                self.location = self.town
+                print("You leave the dungeon and return to town.")
         else:
             print("You are not in a dungeon.")
 
@@ -118,10 +130,10 @@ class Game:
 
     # Enemy turn logic for combat
     def enemy_turn(self):
-        if not self.dungeon.get_current_room().enemies:
+        if not self.check_if_in_combat():
             return
 
-        damage = max(0, self.dungeon.get_current_room().enemies[0].strength - self.player.defense)
+        damage = self.dungeon.get_current_room().enemies[0].calculate_attack_damage()
         self.player.take_damage(damage)
 
         print(f"The {self.dungeon.get_current_room().enemies[0].name} attacks you for {damage} damage!")
@@ -129,6 +141,15 @@ class Game:
         if self.player.health <= 0:
             print("You have been defeated! Game Over.")
             exit(0)
+
+    # Command to display help for a specific command
+    def cmd_help(self, command):
+        if command in COMMANDS:
+            info = COMMANDS[command]
+            args = " ".join(f"<{arg}>" for arg in info["args"])
+            print(f"  {command} {args} - {info['description']}")
+        else:
+            print("Command not found.")
 
     # Handle user input and execute the corresponding command
     def handle_command(self, command_name, *args):

@@ -4,5 +4,5 @@ class Location:
         self.description = description
 
     def display(self):
-        print(f"=== {self.name} ===")
+        print(f"You are at {self.name}.")
         print(self.description)

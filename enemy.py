@@ -12,3 +12,15 @@ class Enemy:
         print(f"  HP: {self.hp}")
         print(f"  Strength: {self.strength}")
         print(f"  Defense: {self.defense}")
+
+    def calculate_attack_damage(self):
+        base_damage = self.strength
+        
+        return base_damage
+
+    def take_damage(self, amount):
+        damage_taken = amount
+        self.hp -= damage_taken
+
+        if self.hp <= 0:
+            print(f"The {self.name} has been defeated!")
