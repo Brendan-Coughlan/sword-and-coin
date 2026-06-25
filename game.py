@@ -12,13 +12,8 @@ class Game:
             "Dungeon", "A damp cave filled with goblins.", difficulty=1
         )
 
-        self.goblin = Enemy(
-            "Goblin", hp=30, strength=5, defense=2, xp_reward=10, gold_reward=5
-        )
-
         self.player = Player("Hero")
         self.location = self.dungeon
-        self.current_enemy = None
 
     # Command to attack an enemy
     def cmd_attack(self):
@@ -26,30 +21,30 @@ class Game:
             print("You can't attack here.")
             return
 
-        if self.current_enemy is None:
+        if not self.dungeon.get_current_room().enemies:
             print("There is no enemy to attack.")
             return
 
-        damage = max(0, self.player.strength - self.current_enemy.defense)
-        self.current_enemy.hp -= damage
-        print(f"You attack the {self.current_enemy.name} for {damage} damage!")
+        damage = max(0, self.player.strength - self.dungeon.get_current_room().enemies[0].defense)
+        self.dungeon.get_current_room().enemies[0].hp -= damage
+        print(f"You attack the {self.dungeon.get_current_room().enemies[0].name} for {damage} damage!")
 
-        if self.current_enemy.hp <= 0:
-            print(f"You have defeated the {self.current_enemy.name}!")
-            self.player.gain_xp(self.current_enemy.xp_reward)
-            self.player.gain_gold(self.current_enemy.gold_reward)
-            self.current_enemy = None
+        if self.dungeon.get_current_room().enemies[0].hp <= 0:
+            print(f"You have defeated the {self.dungeon.get_current_room().enemies[0].name}!")
+            self.player.gain_xp(self.dungeon.get_current_room().enemies[0].xp_reward)
+            self.player.gain_gold(self.dungeon.get_current_room().enemies[0].gold_reward)
+            self.dungeon.get_current_room().enemies.pop(0)
             return
 
         self.enemy_turn()
 
     # Command to flee from an enemy
     def cmd_flee(self):
-        if self.current_enemy is None:
+        if not self.dungeon.get_current_room().enemies:
             print("You are not in combat.")
             return
 
-        print(f"You flee from the {self.current_enemy.name}!")
+        print(f"You flee from the {self.dungeon.get_current_room().enemies[0].name}!")
 
         self.current_enemy = None
 
@@ -75,19 +70,28 @@ class Game:
     def cmd_stats(self):
         self.player.display_stats()
 
+    # Command to display the current enemy's stats
+    def cmd_enemy(self):
+        if not self.dungeon.get_current_room().enemies:
+            print("No enemy present.")
+            return
+
+        print(
+            f"{self.dungeon.get_current_room().enemies[0].name} "
+            f"(HP: {self.dungeon.get_current_room().enemies[0].hp})"
+        )
+
     # Forward command to move deeper into the dungeon
     def cmd_forward(self):
-        if isinstance(self.location, Dungeon):
-            if self.current_enemy is not None and self.current_enemy.hp > 0:
-                print("You must defeat the current enemy before moving forward!")
-                return
-
-            self.location.move_forward()
-            self.current_enemy = (
-                self.goblin
-            )  # Set the current enemy to the goblin for combat
-        else:
+        if not isinstance(self.location, Dungeon):
             print("You can't move forward from here.")
+            return
+
+        if self.dungeon.get_current_room() and self.dungeon.get_current_room().enemies:
+            print("You must defeat the current enemy before moving forward!")
+            return
+
+        room = self.location.move_forward()
 
     # Leave command to exit the dungeon and return to town
     def cmd_leave(self):
@@ -114,13 +118,13 @@ class Game:
 
     # Enemy turn logic for combat
     def enemy_turn(self):
-        if self.current_enemy is None:
+        if not self.dungeon.get_current_room().enemies:
             return
 
-        damage = max(0, self.current_enemy.strength - self.player.defense)
+        damage = max(0, self.dungeon.get_current_room().enemies[0].strength - self.player.defense)
         self.player.take_damage(damage)
 
-        print(f"The {self.current_enemy.name} attacks you for {damage} damage!")
+        print(f"The {self.dungeon.get_current_room().enemies[0].name} attacks you for {damage} damage!")
 
         if self.player.health <= 0:
             print("You have been defeated! Game Over.")
@@ -153,7 +157,9 @@ class Game:
         handler = getattr(self, command["handler"], None)
 
         if handler:
+            print()
             handler(*args)
+            print()
 
     # Run the game loop, continuously prompting for user input and handling commands
     def run(self):

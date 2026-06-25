@@ -13,21 +13,19 @@ class Dungeon(Location):
     def generate_room(self):
         self.current_room += 1
 
-        event_type = random.choices(
-            ["enemy", "loot", "trap", "empty"],
-            weights=[50, 25, 15, 10]
-        )[0]
 
-        room = Room(self.current_room, event_type)
+        room = Room(self.current_room)
 
         self.rooms[self.current_room] = room
 
         return room
+    
+    def get_current_room(self):
+        return self.rooms.get(self.current_room, None)
 
     def move_forward(self):
         room = self.generate_room()
 
-        print()
         room.display()
 
         return room

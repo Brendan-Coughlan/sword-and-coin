@@ -43,5 +43,10 @@ COMMANDS = {
         "description": "Flee from an enemy",
         "args": [],
         "handler": "cmd_flee"
+    },
+    "enemy": {
+        "description": "Display the current enemy's stats",
+        "args": [],
+        "handler": "cmd_enemy"
     }
 }

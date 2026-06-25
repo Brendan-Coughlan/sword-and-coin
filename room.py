@@ -1,23 +1,21 @@
-from location import Location
-import random
+from enemy import Enemy
 
 class Room:
-    def __init__(self, room_number, event_type):
+    def __init__(self, room_number):
         self.room_number = room_number
-        self.event_type = event_type
+        self.description = f"This is room {room_number}."
+        self.enemies = [
+            Enemy("Goblin", hp=30, strength=5, defense=2, xp_reward=10, gold_reward=5)
+        ]
+        self.loot = []
         self.cleared = False
 
     def display(self):
-        print(f"=== Room {self.room_number} ===")
+        print(self.description)
 
-        if self.event_type == "enemy":
+        if self.enemies:
             print("An enemy lurks here.")
-
-        elif self.event_type == "loot":
+        elif self.loot:
             print("You spot something valuable.")
-
-        elif self.event_type == "trap":
-            print("Something feels dangerous.")
-
         else:
             print("The room is empty.")
