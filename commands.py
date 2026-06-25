@@ -33,5 +33,15 @@ COMMANDS = {
         "description": "Travel to a different location",
         "args": ["location_name"],
         "handler": "cmd_travel"
+    },
+    "attack": {
+        "description": "Attack an enemy",
+        "args": [],
+        "handler": "cmd_attack"
+    },
+    "flee": {
+        "description": "Flee from an enemy",
+        "args": [],
+        "handler": "cmd_flee"
     }
 }

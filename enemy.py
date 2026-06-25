@@ -3,14 +3,12 @@ class Enemy:
         self.name = name
         self.xp_reward = xp_reward
         self.gold_reward = gold_reward
-
-        self.stats = {
-            "hp": hp,
-            "strength": strength,
-            "defense": defense
-        }
+        self.hp = hp
+        self.strength = strength
+        self.defense = defense
 
     def display_stats(self):
         print(f"{self.name}'s Stats:")
-        for stat, value in self.stats.items():
-            print(f"  {stat.capitalize()}: {value}")
+        print(f"  HP: {self.hp}")
+        print(f"  Strength: {self.strength}")
+        print(f"  Defense: {self.defense}")

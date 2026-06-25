@@ -18,6 +18,40 @@ class Game:
 
         self.player = Player("Hero")
         self.location = self.dungeon
+        self.current_enemy = None
+
+    # Command to attack an enemy
+    def cmd_attack(self):
+        if not isinstance(self.location, Dungeon):
+            print("You can't attack here.")
+            return
+
+        if self.current_enemy is None:
+            print("There is no enemy to attack.")
+            return
+
+        damage = max(0, self.player.strength - self.current_enemy.defense)
+        self.current_enemy.hp -= damage
+        print(f"You attack the {self.current_enemy.name} for {damage} damage!")
+
+        if self.current_enemy.hp <= 0:
+            print(f"You have defeated the {self.current_enemy.name}!")
+            self.player.gain_xp(self.current_enemy.xp_reward)
+            self.player.gain_gold(self.current_enemy.gold_reward)
+            self.current_enemy = None
+            return
+
+        self.enemy_turn()
+
+    # Command to flee from an enemy
+    def cmd_flee(self):
+        if self.current_enemy is None:
+            print("You are not in combat.")
+            return
+
+        print(f"You flee from the {self.current_enemy.name}!")
+
+        self.current_enemy = None
 
     # Command to quit the game
     def cmd_quit(self):
@@ -44,7 +78,14 @@ class Game:
     # Forward command to move deeper into the dungeon
     def cmd_forward(self):
         if isinstance(self.location, Dungeon):
+            if self.current_enemy is not None and self.current_enemy.hp > 0:
+                print("You must defeat the current enemy before moving forward!")
+                return
+
             self.location.move_forward()
+            self.current_enemy = (
+                self.goblin
+            )  # Set the current enemy to the goblin for combat
         else:
             print("You can't move forward from here.")
 
@@ -70,6 +111,20 @@ class Game:
             print("You travel to the town.")
         else:
             print(f"Unknown location: {location_name}")
+
+    # Enemy turn logic for combat
+    def enemy_turn(self):
+        if self.current_enemy is None:
+            return
+
+        damage = max(0, self.current_enemy.strength - self.player.defense)
+        self.player.take_damage(damage)
+
+        print(f"The {self.current_enemy.name} attacks you for {damage} damage!")
+
+        if self.player.health <= 0:
+            print("You have been defeated! Game Over.")
+            exit(0)
 
     # Handle user input and execute the corresponding command
     def handle_command(self, command_name, *args):

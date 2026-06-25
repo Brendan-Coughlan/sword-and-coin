@@ -41,7 +41,6 @@ class Player:
     def take_damage(self, amount):
         damage_taken = max(0, amount - self.defense)
         self.health -= damage_taken
-        print(f"You took {damage_taken} damage!")
 
         if self.health <= 0:
             print("You have been defeated!")
