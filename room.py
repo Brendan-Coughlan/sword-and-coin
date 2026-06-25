@@ -6,10 +6,10 @@ class Room:
         self.room_number = room_number
         self.description = f"This is room {room_number}."
         self.enemies = [
-            Enemy("Goblin", hp=30, strength=5, defense=2, xp_reward=10, gold_reward=5)
+            Enemy("Goblin", health=30, strength=5, defense=2, xp_reward=10, gold_reward=5)
         ]
         self.loot = [
-            Item("Goblin Ear", "A trophy from a defeated goblin", value=5)
+            Item("goblin_ear","Goblin Ear", "A trophy from a defeated goblin", value=5)
         ]
         self.cleared = False
 

@@ -1,21 +1,47 @@
 from commands import *
 from dungeon import Dungeon
 from enemy import Enemy
-from item import Item
+from game_data import GameData
 from location import Location
 from player import Player
 
-TOWN = Location("Town", "A bustling town with shops and NPCs.")
-DUNGEON = Dungeon("Dungeon", "A damp cave filled with goblins.", difficulty=1)
-
-ITEMS = {
-    "goblin_ear": Item("goblin_ear", "Goblin Ear", "A trophy from a defeated goblin", value=5),
-}
-
 class Game:
     def __init__(self):
+        self.data = GameData()
         self.player = Player("Hero")
-        self.location = DUNGEON
+        self.location = self.create_location("goblin_cave")
+
+    def create_enemy(self, enemy_name):
+        enemy_data = self.data.enemies.get(enemy_name)
+        if enemy_data:
+            return Enemy(
+                name=enemy_data["name"],
+                health=enemy_data["health"],
+                attack=enemy_data["attack"],
+                xp_reward=enemy_data["xp_reward"],
+                gold_reward=enemy_data["gold_reward"]
+            )
+        else:
+            print(f"Enemy '{enemy_name}' not found.")
+            return None
+        
+    def create_location(self, location_name):
+        location_data = self.data.locations.get(location_name)
+        if location_data:
+            if location_data["type"] == "Dungeon":
+                return Dungeon(
+                    name=location_data["name"],
+                    description=location_data["description"],
+                    difficulty=location_data["difficulty"]
+                )
+            else:
+                return Location(
+                    name=location_data["name"],
+                    description=location_data["description"]
+                )
+        else:
+            print(f"Location '{location_name}' not found.")
+            return None
 
     def check_if_in_dungeon(self):
         return isinstance(self.location, Dungeon)
@@ -44,15 +70,18 @@ class Game:
             print("There is no enemy to attack.")
             return
 
-        damage = self.player.calculate_attack_damage()
-        self.location.get_current_room().enemies[0].take_damage(damage)
-        print(f"You attack the {self.location.get_current_room().enemies[0].name} for {damage} damage!")
+        room = self.location.get_current_room()
+        enemy = room.enemies[0]
 
-        if self.location.get_current_room().enemies[0].health <= 0:
-            print(f"You have defeated the {self.location.get_current_room().enemies[0].name}!")
-            self.player.gain_xp(self.location.get_current_room().enemies[0].xp_reward)
-            self.player.gain_gold(self.location.get_current_room().enemies[0].gold_reward)
-            self.location.get_current_room().enemies.pop(0)
+        damage = self.player.calculate_attack_damage()
+        enemy.take_damage(damage)
+        print(f"You attack the {enemy.name} for {damage} damage!")
+
+        if enemy.health <= 0:
+            print(f"You have defeated the {enemy.name}!")
+            self.player.gain_xp(enemy.xp_reward)
+            self.player.gain_gold(enemy.gold_reward)
+            room.enemies.pop(0)
             return
 
         self.enemy_turn()
@@ -63,9 +92,12 @@ class Game:
             print("You are not in combat.")
             return
 
-        print(f"You flee from the {self.location.get_current_room().enemies[0].name}!")
+        room = self.location.get_current_room()
+        enemy = room.enemies[0]
 
-        self.current_enemy = None
+        print(f"You flee from the {enemy.name}!")
+
+        room.enemies.pop(0)
 
     # Command to quit the game
     def cmd_quit(self):
@@ -86,9 +118,12 @@ class Game:
             print("No enemy present.")
             return
 
+        room = self.location.get_current_room()
+        enemy = room.enemies[0]
+
         print(
-            f"{self.location.get_current_room().enemies[0].name} "
-            f"(HP: {self.location.get_current_room().enemies[0].health}/{self.location.get_current_room().enemies[0].max_health})"
+            f"{enemy.name} "
+            f"(HP: {enemy.health}/{enemy.max_health})"
         )
 
     # Forward command to move deeper into the dungeon
@@ -110,35 +145,31 @@ class Game:
                 print("You must defeat the current enemy before leaving the dungeon!")
                 return
             else:
-                self.location = TOWN
+                self.location = self.create_location("town")
                 print("You leave the dungeon and return to town.")
         else:
             print("You are not in a dungeon.")
 
     # Travel command to move between locations
     def cmd_travel(self, location_name):
-        if self.location.name.lower() == location_name.lower():
-            print(f"You are already in {location_name}.")
-            return
-
-        if location_name.lower() == "dungeon":
-            self.location = DUNGEON
-            print("You travel to the dungeon.")
-        elif location_name.lower() == "town":
-            self.location = TOWN
-            print("You travel to the town.")
+        self.location = self.create_location(location_name)
+        if self.location:
+            print(f"You travel to {self.location.name}.")
         else:
-            print(f"Unknown location: {location_name}")
+            print("Unknown location.")
 
     # Enemy turn logic for combat
     def enemy_turn(self):
         if not self.check_if_in_combat():
             return
+        
+        room = self.location.get_current_room()
+        enemy = room.enemies[0]
 
-        damage = self.location.get_current_room().enemies[0].calculate_attack_damage()
+        damage = enemy.calculate_attack_damage()
         self.player.take_damage(damage)
 
-        print(f"The {self.location.get_current_room().enemies[0].name} attacks you for {damage} damage!")
+        print(f"The {enemy.name} attacks you for {damage} damage!")
 
         if self.player.health <= 0:
             print("You have been defeated! Game Over.")

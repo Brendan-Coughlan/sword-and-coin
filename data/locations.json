@@ -1,9 +1,11 @@
 {
     "town": {
+        "type": "Overworld",
         "name": "Town",
         "description": "A bustling town."
     },
     "goblin_cave": {
+        "type": "Dungeon",
         "name": "Goblin Cave",
         "description": "A damp cave filled with goblins.",
         "difficulty": 1
