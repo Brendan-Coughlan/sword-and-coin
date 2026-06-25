@@ -1,26 +1,28 @@
 from commands import *
 from dungeon import Dungeon
 from enemy import Enemy
+from item import Item
 from location import Location
 from player import Player
 
+TOWN = Location("Town", "A bustling town with shops and NPCs.")
+DUNGEON = Dungeon("Dungeon", "A damp cave filled with goblins.", difficulty=1)
+
+ITEMS = {
+    "goblin_ear": Item("goblin_ear", "Goblin Ear", "A trophy from a defeated goblin", value=5),
+}
 
 class Game:
     def __init__(self):
-        self.town = Location("Town", "A bustling town with shops and NPCs.")
-        self.dungeon = Dungeon(
-            "Dungeon", "A damp cave filled with goblins.", difficulty=1
-        )
-
         self.player = Player("Hero")
-        self.location = self.dungeon
+        self.location = DUNGEON
 
     def check_if_in_dungeon(self):
         return isinstance(self.location, Dungeon)
 
     def check_if_in_combat(self):
         if isinstance(self.location, Dungeon):
-            if self.dungeon.get_current_room() and self.dungeon.get_current_room().enemies:
+            if self.location.get_current_room() and self.location.get_current_room().enemies:
                 return True
         return False
 
@@ -43,14 +45,14 @@ class Game:
             return
 
         damage = self.player.calculate_attack_damage()
-        self.dungeon.get_current_room().enemies[0].take_damage(damage)
-        print(f"You attack the {self.dungeon.get_current_room().enemies[0].name} for {damage} damage!")
+        self.location.get_current_room().enemies[0].take_damage(damage)
+        print(f"You attack the {self.location.get_current_room().enemies[0].name} for {damage} damage!")
 
-        if self.dungeon.get_current_room().enemies[0].hp <= 0:
-            print(f"You have defeated the {self.dungeon.get_current_room().enemies[0].name}!")
-            self.player.gain_xp(self.dungeon.get_current_room().enemies[0].xp_reward)
-            self.player.gain_gold(self.dungeon.get_current_room().enemies[0].gold_reward)
-            self.dungeon.get_current_room().enemies.pop(0)
+        if self.location.get_current_room().enemies[0].health <= 0:
+            print(f"You have defeated the {self.location.get_current_room().enemies[0].name}!")
+            self.player.gain_xp(self.location.get_current_room().enemies[0].xp_reward)
+            self.player.gain_gold(self.location.get_current_room().enemies[0].gold_reward)
+            self.location.get_current_room().enemies.pop(0)
             return
 
         self.enemy_turn()
@@ -61,7 +63,7 @@ class Game:
             print("You are not in combat.")
             return
 
-        print(f"You flee from the {self.dungeon.get_current_room().enemies[0].name}!")
+        print(f"You flee from the {self.location.get_current_room().enemies[0].name}!")
 
         self.current_enemy = None
 
@@ -85,8 +87,8 @@ class Game:
             return
 
         print(
-            f"{self.dungeon.get_current_room().enemies[0].name} "
-            f"(HP: {self.dungeon.get_current_room().enemies[0].hp})"
+            f"{self.location.get_current_room().enemies[0].name} "
+            f"(HP: {self.location.get_current_room().enemies[0].health}/{self.location.get_current_room().enemies[0].max_health})"
         )
 
     # Forward command to move deeper into the dungeon
@@ -108,7 +110,7 @@ class Game:
                 print("You must defeat the current enemy before leaving the dungeon!")
                 return
             else:
-                self.location = self.town
+                self.location = TOWN
                 print("You leave the dungeon and return to town.")
         else:
             print("You are not in a dungeon.")
@@ -120,10 +122,10 @@ class Game:
             return
 
         if location_name.lower() == "dungeon":
-            self.location = self.dungeon
+            self.location = DUNGEON
             print("You travel to the dungeon.")
         elif location_name.lower() == "town":
-            self.location = self.town
+            self.location = TOWN
             print("You travel to the town.")
         else:
             print(f"Unknown location: {location_name}")
@@ -133,10 +135,10 @@ class Game:
         if not self.check_if_in_combat():
             return
 
-        damage = self.dungeon.get_current_room().enemies[0].calculate_attack_damage()
+        damage = self.location.get_current_room().enemies[0].calculate_attack_damage()
         self.player.take_damage(damage)
 
-        print(f"The {self.dungeon.get_current_room().enemies[0].name} attacks you for {damage} damage!")
+        print(f"The {self.location.get_current_room().enemies[0].name} attacks you for {damage} damage!")
 
         if self.player.health <= 0:
             print("You have been defeated! Game Over.")

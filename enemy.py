@@ -1,15 +1,16 @@
 class Enemy:
-    def __init__(self, name, hp, strength, defense, xp_reward, gold_reward):
+    def __init__(self, name, health, strength, defense, xp_reward, gold_reward):
         self.name = name
         self.xp_reward = xp_reward
         self.gold_reward = gold_reward
-        self.hp = hp
+        self.health = health
+        self.max_health = health
         self.strength = strength
         self.defense = defense
 
     def display_stats(self):
         print(f"{self.name}'s Stats:")
-        print(f"  HP: {self.hp}")
+        print(f"  HP: {self.health}/{self.max_health}")
         print(f"  Strength: {self.strength}")
         print(f"  Defense: {self.defense}")
 
@@ -20,7 +21,7 @@ class Enemy:
 
     def take_damage(self, amount):
         damage_taken = amount
-        self.hp -= damage_taken
+        self.health -= damage_taken
 
-        if self.hp <= 0:
+        if self.health <= 0:
             print(f"The {self.name} has been defeated!")

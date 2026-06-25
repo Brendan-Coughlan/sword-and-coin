@@ -1,0 +1,11 @@
+{
+    "town": {
+        "name": "Town",
+        "description": "A bustling town."
+    },
+    "goblin_cave": {
+        "name": "Goblin Cave",
+        "description": "A damp cave filled with goblins.",
+        "difficulty": 1
+    }
+}
